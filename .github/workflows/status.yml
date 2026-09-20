@@ -1,0 +1,71 @@
+name: Monitor and Deploy SNine Status
+
+on:
+  push:
+    branches: ["main"]
+    paths-ignore:
+      - "api/history.json"
+      - "api/auto-incidents.json"
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: snine-status
+  cancel-in-progress: true
+
+jobs:
+  monitor-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    env:
+      SNINE_CORE_HEALTH_URL: ${{ secrets.SNINE_CORE_HEALTH_URL }}
+      SNINE_AUTH_HEALTH_URL: ${{ secrets.SNINE_AUTH_HEALTH_URL }}
+      SNINE_COSMETICS_HEALTH_URL: ${{ secrets.SNINE_COSMETICS_HEALTH_URL }}
+      SNINE_LAUNCHER_HEALTH_URL: ${{ secrets.SNINE_LAUNCHER_HEALTH_URL }}
+      SNINE_WEBSOCKET_HOST: ${{ secrets.SNINE_WEBSOCKET_HOST }}
+      SNINE_WEBSOCKET_PORT: ${{ secrets.SNINE_WEBSOCKET_PORT }}
+      SNINE_MINECRAFT_HOST: ${{ secrets.SNINE_MINECRAFT_HOST }}
+      SNINE_MINECRAFT_PORT: ${{ secrets.SNINE_MINECRAFT_PORT }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Check SNine services
+        run: python3 scripts/check_status.py
+
+      - name: Persist state changes
+        shell: bash
+        run: |
+          git config user.name "snine-status[bot]"
+          git config user.email "snine-status[bot]@users.noreply.github.com"
+          git add api/history.json api/auto-incidents.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(status): record service state change [skip ci]"
+            git push
+          else
+            echo "No service state changes to persist."
+          fi
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
