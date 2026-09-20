@@ -1,0 +1,73 @@
+{
+  "groups": [
+    {
+      "name": "Websites",
+      "services": [
+        {
+          "id": "homepage",
+          "name": "Homepage",
+          "description": "Main S9Lab website",
+          "check": {"type":"http","url":"https://s9lab.site/","timeout":12,"degradedAfterMs":1800}
+        },
+        {
+          "id": "roadmap",
+          "name": "Roadmap",
+          "description": "Public SNine development roadmap",
+          "check": {"type":"http","url":"https://roadmap.s9lab.site/","timeout":12,"degradedAfterMs":1800}
+        }
+      ]
+    },
+    {
+      "name": "API's",
+      "services": [
+        {
+          "id": "core",
+          "name": "Core",
+          "description": "SNine backend REST API",
+          "check": {"type":"http_env","env":"SNINE_CORE_HEALTH_URL","timeout":10,"degradedAfterMs":1200},
+          "manualStatus":"operational"
+        },
+        {
+          "id": "auth",
+          "name": "Authentication",
+          "description": "SNine authentication services",
+          "check": {"type":"http_env","env":"SNINE_AUTH_HEALTH_URL","timeout":10,"degradedAfterMs":1200,"fallbackService":"core"},
+          "manualStatus":"operational"
+        },
+        {
+          "id": "launcher",
+          "name": "Launcher",
+          "description": "Launcher integration and update services",
+          "check": {"type":"http_env","env":"SNINE_LAUNCHER_HEALTH_URL","timeout":10,"degradedAfterMs":1500,"fallbackService":"core"},
+          "manualStatus":"operational"
+        },
+        {
+          "id": "cosmetics",
+          "name": "Cosmetics",
+          "description": "Cosmetic catalog and delivery",
+          "check": {"type":"http_env","env":"SNINE_COSMETICS_HEALTH_URL","timeout":10,"degradedAfterMs":1500,"fallbackService":"core"},
+          "manualStatus":"operational"
+        },
+        {
+          "id": "realtime",
+          "name": "Realtime",
+          "description": "WebSocket and live client updates",
+          "check": {"type":"tcp_env","hostEnv":"SNINE_WEBSOCKET_HOST","portEnv":"SNINE_WEBSOCKET_PORT","timeout":8,"fallbackService":"core"},
+          "manualStatus":"operational"
+        }
+      ]
+    },
+    {
+      "name": "Minecraft Network",
+      "services": [
+        {
+          "id": "network",
+          "name": "Network",
+          "description": "SNine Minecraft network",
+          "check": {"type":"tcp_env","hostEnv":"SNINE_MINECRAFT_HOST","portEnv":"SNINE_MINECRAFT_PORT","timeout":8},
+          "manualStatus":"operational"
+        }
+      ]
+    }
+  ]
+}
