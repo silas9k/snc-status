@@ -1,1 +1,52 @@
-{"services":{}}
+{
+  "services": {
+    "homepage": [
+      {
+        "at": "2026-09-20T19:25:37.246097Z",
+        "status": "operational"
+      }
+    ],
+    "roadmap": [
+      {
+        "at": "2026-09-20T19:25:37.246097Z",
+        "status": "operational"
+      }
+    ],
+    "core": [
+      {
+        "at": "2026-09-20T19:25:37.246097Z",
+        "status": "operational"
+      }
+    ],
+    "auth": [
+      {
+        "at": "2026-09-20T19:25:37.246097Z",
+        "status": "operational"
+      }
+    ],
+    "launcher": [
+      {
+        "at": "2026-09-20T19:25:37.246097Z",
+        "status": "operational"
+      }
+    ],
+    "cosmetics": [
+      {
+        "at": "2026-09-20T19:25:37.246097Z",
+        "status": "operational"
+      }
+    ],
+    "realtime": [
+      {
+        "at": "2026-09-20T19:25:37.246097Z",
+        "status": "operational"
+      }
+    ],
+    "network": [
+      {
+        "at": "2026-09-20T19:25:37.246097Z",
+        "status": "operational"
+      }
+    ]
+  }
+}
