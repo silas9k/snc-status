@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070707">
+<meta name="description" content="Live service status for SNine Client and S9Lab.">
+<title>SNine Client Status</title>
+<link rel="icon" type="image/png" href="https://s9lab.site/manus-storage/s9lab-icon_2dc83a46.png">
+<style>
+:root{
+  --bg:#070707;--panel:#0d0d0e;--panel2:#111113;--panel3:#161618;
+  --line:#242427;--line2:#303035;--text:#f4f4f5;--muted:#8b8b92;--dim:#5e5e65;
+  --red:#dc2626;--red2:#991b1b;--green:#31c478;--yellow:#e7ad43;--gray:#4d4d54;
+  --shadow:0 24px 70px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:
+radial-gradient(circle at 50% -18%,rgba(220,38,38,.095),transparent 31rem),
+linear-gradient(180deg,#090909 0,var(--bg) 360px);
+color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px}
+button,input{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}
+.wrap{width:min(820px,calc(100% - 34px));margin:0 auto}
+.header{height:78px;border-bottom:1px solid rgba(255,255,255,.055)}
+.header-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:11px}
+.brand img{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(255,255,255,.04))}
+.brand-copy{display:grid;line-height:1.08}
+.brand-copy b{font-size:14px;letter-spacing:-.02em}
+.brand-copy span{margin-top:4px;color:#68686f;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.header-links{display:flex;align-items:center;gap:7px}
+.header-links a,.header-links button{height:34px;border:1px solid transparent;border-radius:8px;background:transparent;color:#85858c;padding:0 10px;font-size:11px;font-weight:700}
+.header-links a:hover,.header-links button:hover{color:#fff;background:#111113;border-color:#252528}
+.header-links .home{border-color:#2a2a2e;background:#101012;color:#d2d2d6}
+.hero{padding:60px 0 29px;text-align:center}
+.hero-logo{width:78px;height:78px;object-fit:contain;margin-bottom:22px;filter:drop-shadow(0 14px 24px rgba(255,255,255,.04))}
+.hero h1{margin:0;font-size:30px;letter-spacing:-.04em}
+.hero p{margin:9px auto 0;color:var(--muted);font-size:12px;line-height:1.6}
+.overall{display:flex;align-items:center;gap:13px;border:1px solid rgba(49,196,120,.22);background:linear-gradient(180deg,rgba(49,196,120,.075),rgba(49,196,120,.035));border-radius:12px;padding:15px 17px;margin:8px 0 11px}
+.overall.degraded{border-color:rgba(231,173,67,.24);background:rgba(231,173,67,.055)}
+.overall.outage{border-color:rgba(220,38,38,.27);background:rgba(220,38,38,.06)}
+.overall.unknown{border-color:#2b2b2f;background:#101012}
+.overall-icon{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(49,196,120,.13);color:#6fe1a5;font-weight:900}
+.degraded .overall-icon{background:rgba(231,173,67,.12);color:#f2c268}.outage .overall-icon{background:rgba(220,38,38,.12);color:#ff8686}.unknown .overall-icon{background:#1a1a1d;color:#888890}
+.overall-copy{flex:1}.overall-copy b{display:block;font-size:13px}.overall-copy span{display:block;margin-top:3px;color:#73737b;font-size:10px}
+.overall-time{font-size:9px;color:#63636b;text-align:right}
+.navtabs{display:flex;gap:4px;padding:10px 0 22px}
+.navtabs button{border:1px solid transparent;border-radius:8px;background:transparent;color:#74747b;padding:7px 10px;font-size:10px;font-weight:800}
+.navtabs button:hover,.navtabs button.active{background:#111113;border-color:#242427;color:#f2f2f4}
+.page{display:none;padding-bottom:48px}.page.active{display:block}
+.group{margin-bottom:25px}
+.group-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.group-head h2{margin:0;font-size:12px;letter-spacing:-.01em}.group-head span{font-size:9px;color:#67676f}
+.services{border:1px solid var(--line);background:rgba(13,13,14,.82);border-radius:12px;overflow:hidden}
+.service{padding:15px 16px;border-bottom:1px solid var(--line)}
+.service:last-child{border-bottom:0}
+.service-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:15px;align-items:start}
+.service-name{display:flex;align-items:center;gap:8px}
+.service-name h3{margin:0;font-size:12px}
+.service-name small{display:block;color:#616169;font-size:9px;margin-top:3px}
+.state{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:850}
+.state-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.state.degraded{color:#e5b75d}.state.degraded .state-dot{background:var(--yellow)}
+.state.outage{color:#f37979}.state.outage .state-dot{background:var(--red)}
+.state.unknown{color:#73737b}.state.unknown .state-dot{background:#57575e}
+.state.operational{color:#68d99f}
+.uptime-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;margin-top:13px}
+.uptime-label,.uptime-value{font-size:8px;color:#606069;white-space:nowrap}
+.uptime-value{color:#85858d}
+.bars{display:grid;grid-template-columns:repeat(30,1fr);gap:2px;height:24px;align-items:stretch}
+.bar{height:100%;border-radius:2px;background:#242427;position:relative}
+.bar.operational{background:#248d5b}.bar.degraded{background:#ae7c2d}.bar.outage{background:#992f35}.bar.unknown{background:#252529}
+.bar:hover:after{content:attr(data-tip);position:absolute;z-index:20;left:50%;bottom:32px;transform:translateX(-50%);white-space:nowrap;background:#18181b;border:1px solid #313136;color:#cfcfd4;border-radius:6px;padding:5px 7px;font-size:8px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.service-meta{display:flex;justify-content:space-between;gap:12px;margin-top:6px;color:#56565e;font-size:8px}
+.service-meta .manual{color:#806a6a}
+.section-title{margin:0 0 14px;font-size:20px;letter-spacing:-.035em}
+.section-sub{margin:-7px 0 20px;color:#74747c;font-size:10px}
+.incident-month{margin:0 0 24px}
+.month-title{margin:0 0 9px;font-size:11px}
+.incident-card{border:1px solid var(--line);background:#0d0d0e;border-radius:12px;padding:15px 16px;margin-bottom:9px}
+.incident-card.resolved{opacity:.82}
+.incident-top{display:flex;justify-content:space-between;gap:14px}
+.incident-card h3{font-size:12px;margin:0}
+.incident-badge{border-radius:999px;padding:4px 7px;font-size:8px;font-weight:850;background:rgba(220,38,38,.08);border:1px solid rgba(220,38,38,.2);color:#f28b8b}
+.incident-badge.resolved{background:rgba(49,196,120,.07);border-color:rgba(49,196,120,.18);color:#6fdca5}
+.incident-date{font-size:8px;color:#5e5e65;margin-top:4px}
+.update{position:relative;margin-top:13px;padding-left:15px;border-left:1px solid #26262a}
+.update:before{content:"";position:absolute;left:-4px;top:4px;width:7px;height:7px;border-radius:50%;background:#4a4a50}
+.update b{font-size:9px}.update p{margin:4px 0 0;color:#7b7b83;font-size:9px;line-height:1.55}.update time{display:block;margin-top:4px;color:#55555d;font-size:8px}
+.maintenance-card{border:1px solid var(--line);background:#0d0d0e;border-radius:12px;padding:15px 16px;margin-bottom:9px}
+.maintenance-card h3{margin:0 0 5px;font-size:12px}.maintenance-card p{margin:0;color:#7b7b83;font-size:9px;line-height:1.55}.maintenance-time{margin-top:9px;color:#a18761;font-size:8px}
+.empty{border:1px dashed #28282c;border-radius:12px;padding:28px;text-align:center;color:#66666e;font-size:10px}
+.api-box{border:1px solid var(--line);background:#0d0d0e;border-radius:12px;overflow:hidden}
+.api-line{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:13px 15px;border-bottom:1px solid var(--line)}
+.api-line:last-child{border-bottom:0}.api-line code{font:9px ui-monospace,SFMono-Regular,Menlo,monospace;color:#b6b6bd}.api-line a{font-size:9px;color:#df7575}
+.footer{border-top:1px solid rgba(255,255,255,.055);padding:25px 0 36px;margin-top:12px}
+.footer-inner{display:flex;justify-content:space-between;gap:16px;align-items:center;color:#57575f;font-size:9px}
+.footer-links{display:flex;gap:13px}.footer a:hover{color:#aaaab0}
+.loading{height:62px;border-radius:10px;background:linear-gradient(90deg,#0d0d0f,#141416,#0d0d0f);background-size:200% 100%;animation:shimmer 1.4s infinite}
+@keyframes shimmer{to{background-position:-200% 0}}
+@media(max-width:650px){
+.header{height:68px}.brand-copy span,.header-links .home{display:none}.header-links a{padding:0 6px}
+.hero{padding-top:44px}.hero-logo{width:66px;height:66px}.hero h1{font-size:26px}
+.overall{align-items:flex-start}.overall-time{display:none}
+.uptime-row{grid-template-columns:1fr}.uptime-label,.uptime-value{display:none}.bars{height:28px}
+.service-meta{display:block}.service-meta span{display:block;margin-top:3px}
+.footer-inner{align-items:flex-start;flex-direction:column}
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="wrap header-inner">
+    <a class="brand" href="https://s9lab.site">
+      <img src="https://s9lab.site/manus-storage/s9lab-icon_2dc83a46.png" alt="SNine">
+      <span class="brand-copy"><b>SNine Client</b><span>Status</span></span>
+    </a>
+    <div class="header-links">
+      <a href="https://roadmap.s9lab.site">Roadmap</a>
+      <a href="https://s9lab.site" class="home">Get in touch</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <img class="hero-logo" src="https://s9lab.site/manus-storage/s9lab-icon_2dc83a46.png" alt="SNine">
+    <h1>SNine Client Status</h1>
+    <p>Live availability and incident information for the SNine ecosystem.</p>
+  </section>
+
+  <section class="overall unknown" id="overall">
+    <div class="overall-icon" id="overallIcon">•</div>
+    <div class="overall-copy"><b id="overallMessage">Loading current status…</b><span id="overallSub">Checking SNine services</span></div>
+    <div class="overall-time" id="overallTime">—</div>
+  </section>
+
+  <nav class="navtabs">
+    <button class="active" data-page="status">Status</button>
+    <button data-page="incidents">Incidents</button>
+    <button data-page="maintenance">Maintenance</button>
+    <button data-page="api">API</button>
+  </nav>
+
+  <section id="page-status" class="page active">
+    <div id="statusGroups"><div class="loading"></div></div>
+  </section>
+
+  <section id="page-incidents" class="page">
+    <h2 class="section-title">Previous incidents</h2>
+    <p class="section-sub">Incident history for SNine services.</p>
+    <div id="incidents"></div>
+  </section>
+
+  <section id="page-maintenance" class="page">
+    <h2 class="section-title">Scheduled maintenance</h2>
+    <p class="section-sub">Planned service windows and infrastructure work.</p>
+    <div id="maintenance"></div>
+  </section>
+
+  <section id="page-api" class="page">
+    <h2 class="section-title">Status API</h2>
+    <p class="section-sub">Public JSON endpoints generated by the SNine status monitor.</p>
+    <div class="api-box">
+      <div class="api-line"><code>/api/status.json</code><a href="./api/status.json">Open →</a></div>
+      <div class="api-line"><code>/api/incidents.json</code><a href="./api/incidents.json">Open →</a></div>
+      <div class="api-line"><code>/api/maintenance.json</code><a href="./api/maintenance.json">Open →</a></div>
+      <div class="api-line"><code>/api/history.json</code><a href="./api/history.json">Open →</a></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>© 2026 SNine Client · status.s9lab.site</span>
+    <div class="footer-links"><a href="https://s9lab.site">Website</a><a href="https://roadmap.s9lab.site">Roadmap</a><a href="https://github.com/silas9k/snc-status">GitHub</a></div>
+  </div>
+</footer>
+
+<script>
+const stateLabel={operational:"Operational",degraded:"Degraded performance",outage:"Major outage",unknown:"Unknown"};
+const stateIcon={operational:"✓",degraded:"!",outage:"×",unknown:"•"};
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const fmtTime=v=>{if(!v)return"—";const d=new Date(v);return new Intl.DateTimeFormat("en",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZoneName:"short"}).format(d)};
+const monthName=v=>new Intl.DateTimeFormat("en",{month:"long",year:"numeric"}).format(new Date(v));
+let STATUS=null,INCIDENTS=[],MAINTENANCE=[];
+
+function setPage(name){
+ document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id==="page-"+name));
+ document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
+ history.replaceState(null,"","#"+name);
+}
+document.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>setPage(b.dataset.page));
+
+async function getJson(path,fallback){
+ try{const r=await fetch(path+"?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error();return await r.json()}catch{return fallback}
+}
+
+function renderOverall(){
+ const el=document.getElementById("overall");
+ const state=STATUS?.overall||"unknown";
+ el.className="overall "+state;
+ document.getElementById("overallIcon").textContent=stateIcon[state]||"•";
+ document.getElementById("overallMessage").textContent=STATUS?.message||"Status unavailable";
+ const active=Number(STATUS?.active_incidents||0);
+ document.getElementById("overallSub").textContent=active?active+" active incident"+(active===1?"":"s"):"No active incidents";
+ document.getElementById("overallTime").innerHTML="Last updated<br>"+fmtTime(STATUS?.updated_at);
+}
+
+function dayBars(days){
+ const items=(days||[]);
+ if(!items.length)return'<div class="bars">'+Array.from({length:30},()=>'<i class="bar unknown"></i>').join("")+'</div>';
+ return'<div class="bars">'+items.map(d=>'<i class="bar '+esc(d.status)+'" data-tip="'+esc(d.date)+" · "+esc(stateLabel[d.status]||d.status)+'"></i>').join("")+'</div>';
+}
+
+function renderStatus(){
+ const groups=STATUS?.groups||[];
+ document.getElementById("statusGroups").innerHTML=groups.length?groups.map(g=>`
+ <section class="group">
+  <div class="group-head"><h2>${esc(g.name)}</h2><span>${esc(stateLabel[g.status]||g.status)}</span></div>
+  <div class="services">
+   ${(g.services||[]).map(s=>`
+    <article class="service">
+      <div class="service-top">
+        <div class="service-name"><div><h3>${esc(s.name)}</h3><small>${esc(s.description||"")}</small></div></div>
+        <div class="state ${esc(s.status)}"><i class="state-dot"></i>${esc(stateLabel[s.status]||s.status)}</div>
+      </div>
+      <div class="uptime-row">
+        <span class="uptime-label">30 days ago</span>
+        ${dayBars(s.days)}
+        <span class="uptime-value">${s.uptime_30d==null?"—":Number(s.uptime_30d).toFixed(3)+"%"} uptime</span>
+      </div>
+      <div class="service-meta">
+        <span>${s.response_ms==null?"No live latency":esc(s.response_ms)+" ms response"}</span>
+        <span class="${s.source==="manual"?"manual":""}">${s.source==="automatic"?"Automated monitor":s.source==="derived"?"Derived health":"Manual fallback"}</span>
+      </div>
+    </article>`).join("")}
+  </div>
+ </section>`).join(""):'<div class="empty">No services configured.</div>';
+}
+
+function renderIncidents(){
+ if(!INCIDENTS.length){document.getElementById("incidents").innerHTML='<div class="empty">No incidents reported.</div>';return}
+ const byMonth={};
+ for(const i of INCIDENTS){const k=monthName(i.created_at||new Date());(byMonth[k]??=[]).push(i)}
+ document.getElementById("incidents").innerHTML=Object.entries(byMonth).map(([month,list])=>`
+  <section class="incident-month"><h3 class="month-title">${esc(month)}</h3>
+  ${list.map(i=>`<article class="incident-card ${i.status==="resolved"?"resolved":""}">
+    <div class="incident-top"><div><h3>${esc(i.title)}</h3><div class="incident-date">${fmtTime(i.created_at)}</div></div><span class="incident-badge ${i.status==="resolved"?"resolved":""}">${esc(i.status||"investigating")}</span></div>
+    ${(i.updates||[]).slice().reverse().map(u=>`<div class="update"><b>${esc(u.status||"Update")}</b><p>${esc(u.body||"")}</p><time>${fmtTime(u.at)}</time></div>`).join("")}
+  </article>`).join("")}</section>`).join("");
+}
+
+function renderMaintenance(){
+ if(!MAINTENANCE.length){document.getElementById("maintenance").innerHTML='<div class="empty">No maintenance scheduled.</div>';return}
+ document.getElementById("maintenance").innerHTML=MAINTENANCE.map(m=>`
+  <article class="maintenance-card"><h3>${esc(m.title||"Scheduled maintenance")}</h3><p>${esc(m.description||"")}</p><div class="maintenance-time">${fmtTime(m.starts_at)} → ${fmtTime(m.ends_at)}</div></article>`).join("");
+}
+
+async function init(){
+ [STATUS,INCIDENTS,MAINTENANCE]=await Promise.all([
+  getJson("./api/status.json",{overall:"unknown",message:"Status unavailable",groups:[]}),
+  getJson("./api/incidents.json",[]),
+  getJson("./api/maintenance.json",[])
+ ]);
+ renderOverall();renderStatus();renderIncidents();renderMaintenance();
+ const hash=location.hash.replace("#","");
+ if(["status","incidents","maintenance","api"].includes(hash))setPage(hash);
+}
+init();
+setInterval(init,60000);
+</script>
+</body>
+</html>
