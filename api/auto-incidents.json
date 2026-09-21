@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "id": "auto-roadmap-20260921064535",
+    "auto": true,
+    "title": "Roadmap service disruption",
+    "status": "investigating",
+    "impact": "major",
+    "components": [
+      "roadmap"
+    ],
+    "created_at": "2026-09-21T06:45:35.252547Z",
+    "resolved_at": null,
+    "updates": [
+      {
+        "at": "2026-09-21T06:45:35.252547Z",
+        "status": "investigating",
+        "body": "Automated monitoring detected that Roadmap is outage."
+      }
+    ]
+  }
+]
